@@ -24,17 +24,17 @@ describe('/login', () => {
 
   test('ログイン時はユーザー名が表示される', () => {
     return request(app)
-    .get('/login')
-    .expect(/testuser/)
-    .expect(200);
+      .get('/login')
+      .expect(/testuser/)
+      .expect(200);
   });
 });
 
 describe('/logout', () => {
   test('/ にリダイレクトされる', () => {
     return request(app)
-    .get('/logout')
-    .expect('Location', '/')
-    .expect(302);
+      .get('/logout')
+      .expect('Location', '/')
+      .expect(302);
   });
 });
