@@ -18,6 +18,7 @@ User.sync().then(() => {
   Schedule.sync();
   Comment.belongsTo(User, { foreignKey: 'userId' });
   Comment.sync();
+  Availability.belongsTo(User, { foreignKey: 'userId' });
   Candidate.sync().then(() => {
     Availability.belongsTo(Candidate, { foreignKey: 'candidateId' });
     Availability.sync();
@@ -58,6 +59,7 @@ var indexRouter = require('./routes/index');
 var loginRouter = require('./routes/login');
 var logoutRouter = require('./routes/logout');
 var schedulesRouter = require('./routes/schedules');
+var availabilitiesRouter = require('./routes/availabilities');
 
 
 var app = express();
@@ -81,6 +83,7 @@ app.use('/', indexRouter);
 app.use('/login', loginRouter);
 app.use('/logout', logoutRouter);
 app.use('/schedules', schedulesRouter);
+app.use('/schedules', availabilitiesRouter);
 
 app.get('/auth/github',
   passport.authenticate('github', { scope: ['user:email'] }),
