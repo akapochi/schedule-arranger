@@ -20,7 +20,7 @@ describe('/login', () => {
     passportStub.logout();
     passportStub.uninstall(app);
   });
-  
+
   test('ログインのためのリンクが含まれる', () => {
     return request(app)
       .get('/login')
@@ -28,7 +28,7 @@ describe('/login', () => {
       .expect(/<a class="btn btn-info my-3" href="\/auth\/github"/)
       .expect(200);
   });
-  
+
   test('ログイン時はユーザー名が表示される', () => {
     return request(app)
       .get('/login')
@@ -57,15 +57,11 @@ describe('/schedules', () => {
     passportStub.uninstall(app);
   });
 
-  test('予定が作成でき、表示される', done => {
+  test('予定が作成でき、表示される', (done) => {
     User.upsert({ userId: 0, username: 'testuser' }).then(() => {
       request(app)
         .post('/schedules')
-        .send({
-          scheduleName: 'テスト予定1',
-          memo: 'テストメモ1\r\nテストメモ2',
-          candidates: 'テスト候補1\r\nテスト候補2\r\nテスト候補3'
-        })
+        .send({ scheduleName: 'テスト予定1', memo: 'テストメモ1\r\nテストメモ2', candidates: 'テスト候補1\r\nテスト候補2\r\nテスト候補3' })
         .expect('Location', /schedules/)
         .expect(302)
         .end((err, res) => {
@@ -79,7 +75,7 @@ describe('/schedules', () => {
             .expect(/テスト候補2/)
             .expect(/テスト候補3/)
             .expect(200)
-            .end((err, res) => { deleteScheduleAggregate(createdSchedulePath.split('/schedules/')[1], done, err);});
+            .end((err, res) => { deleteScheduleAggregate(createdSchedulePath.split('/schedules/')[1], done, err); });
         });
     });
   });
@@ -95,7 +91,7 @@ describe('/schedules/:scheduleId/users/:userId/candidates/:candidateId', () => {
     passportStub.logout();
     passportStub.uninstall(app);
   });
-  
+
   test('出欠が更新できる', (done) => {
     User.upsert({ userId: 0, username: 'testuser' }).then(() => {
       request(app)
@@ -139,15 +135,11 @@ describe('/schedules/:scheduleId/users/:userId/comments', () => {
     passportStub.uninstall(app);
   });
 
-  test('コメントが更新できる', done => {
+  test('コメントが更新できる', (done) => {
     User.upsert({ userId: 0, username: 'testuser' }).then(() => {
       request(app)
         .post('/schedules')
-        .send({
-          scheduleName: 'テストコメント更新予定1',
-          memo: 'テストコメント更新メモ1',
-          candidates: 'テストコメント更新候補1'
-        })
+        .send({ scheduleName: 'テストコメント更新予定1', memo: 'テストコメント更新メモ1', candidates: 'テストコメント更新候補1' })
         .end((err, res) => {
           const createdSchedulePath = res.headers.location;
           const scheduleId = createdSchedulePath.split('/schedules/')[1];
@@ -160,7 +152,7 @@ describe('/schedules/:scheduleId/users/:userId/comments', () => {
             .end((err, res) => {
               Comment.findAll({
                 where: { scheduleId: scheduleId }
-              }).then(comments => {
+              }).then((comments) => {
                 assert.equal(comments.length, 1);
                 assert.equal(comments[0].comment, 'testcomment');
                 deleteScheduleAggregate(scheduleId, done, err);
@@ -170,6 +162,7 @@ describe('/schedules/:scheduleId/users/:userId/comments', () => {
     });
   });
 });
+
 
 describe('/schedules/:scheduleId?edit=1', () => {
   beforeAll(() => {
@@ -239,8 +232,9 @@ describe('/schedules/:scheduleId?delete=1', () => {
             where: { scheduleId: scheduleId }
           }).then((candidate) => {
             return new Promise((resolve) => {
+              const userId = 0;
               request(app)
-                .post(`/schedules/${scheduleId}/users/${0}/candidates/${candidate.candidateId}`)
+                .post(`/schedules/${scheduleId}/users/${userId}/candidates/${candidate.candidateId}`)
                 .send({ availability: 2 }) // 出席に更新
                 .end((err, res) => {
                   if (err) done(err);
@@ -251,8 +245,9 @@ describe('/schedules/:scheduleId?delete=1', () => {
 
           // コメント作成
           const promiseComment = new Promise((resolve) => {
+            const userId = 0;
             request(app)
-              .post(`/schedules/${scheduleId}/users/${0}/comments`)
+              .post(`/schedules/${scheduleId}/users/${userId}/comments`)
               .send({ comment: 'testcomment' })
               .expect('{"status":"OK","comment":"testcomment"}')
               .end((err, res) => {
