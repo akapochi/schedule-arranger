@@ -28,7 +28,7 @@ router.post('/', authenticationEnsurer, (req, res, next) => {
   });
 });
 
-router.post('/:scheduleId', authenticationEnsurer, (req, res, next) => {
+router.get('/:scheduleId', authenticationEnsurer, (req, res, next) => {
   Schedule.findOne({
     where: {
       scheduleId: req.params.scheduleId
